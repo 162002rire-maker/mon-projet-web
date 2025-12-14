@@ -1,28 +1,28 @@
-name: Pipeline Complet One Piece
+# 1. On déclare qu'on veut utiliser le plugin "Docker"
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~> 3.0.1"
+    }
+  }
+}
 
-on:
-  push:
-    branches:
-      - main
+# 2. On configure le provider (il se connecte à ton Docker Desktop local)
+provider "docker" {}
 
-jobs:
-  deploy-tout:
-    runs-on: ubuntu-latest
-    steps:
-      # 1. On récupère le code
-      - name: Checkout Code
-        uses: actions/checkout@v3
+# 3. On demande à Terraform de télécharger l'image Nginx
+resource "docker_image" "nginx" {
+  name         = "nginx:latest"
+  keep_locally = false
+}
 
-      # 2. On fabrique l'image Docker (CI)
-      - name: Build Docker
-        run: docker build -t site-one-piece .
-
-      # 3. On prépare Terraform (Infra)
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-
-      # 4. On lance Terraform
-      - name: Terraform Init & Apply
-        run: |
-          terraform init
-          terraform apply -auto-approve
+# 4. On demande à Terraform de lancer un Conteneur avec cette image
+resource "docker_container" "nginx" {
+  image = docker_image.nginx.image_id
+  name  = "serveur_cree_par_terraform"
+  
+  # On ouvre le port 8000 sur ton PC pour voir le site
+  ports {
+    internal = 80
+    external = 8000
