@@ -1,0 +1,1 @@
+Le navire One Piece a été déployé avec succès par Terraform.
