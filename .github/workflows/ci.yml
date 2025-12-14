@@ -26,3 +26,12 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve
+      
+      # ... après Terraform ...
+
+      - name: Déploiement FTP (Hébergeur externe)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
